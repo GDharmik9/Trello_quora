@@ -5,6 +5,7 @@ D:\Workspace\Trello_quora\quora-service\src\main\java\com\upgrad\quora\service\e
 D:\Workspace\Trello_quora\quora-service\src\main\java\com\upgrad\quora\service\business\UserBusinessService.java
 D:\Workspace\Trello_quora\quora-service\src\main\java\com\upgrad\quora\service\common\GenericErrorCode.java
 D:\Workspace\Trello_quora\quora-service\src\main\java\com\upgrad\quora\service\dao\UserDao.java
+D:\Workspace\Trello_quora\quora-service\src\main\java\com\upgrad\quora\service\business\AuthenticationService.java
 D:\Workspace\Trello_quora\quora-service\src\main\java\com\upgrad\quora\service\exception\SignUpRestrictedException.java
 D:\Workspace\Trello_quora\quora-service\src\main\java\com\upgrad\quora\service\exception\AuthenticationFailedException.java
 D:\Workspace\Trello_quora\quora-service\src\main\java\com\upgrad\quora\service\common\ErrorCode.java
