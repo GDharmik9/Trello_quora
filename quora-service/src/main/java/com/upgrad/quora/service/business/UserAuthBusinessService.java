@@ -12,11 +12,11 @@ public class UserAuthBusinessService {
     @Autowired
     private UserDao userDao;
 
-    public UserAuthEntity getUser(final String authorizationToken) throws AuthorizationFailedException{
+    public UserAuthEntity getUser(final String authorizationToken) throws AuthorizationFailedException {
 
         UserAuthEntity userAuthEntity = userDao.getUserAuth(authorizationToken);
         if (userAuthEntity == null){
-            throw new AuthorizationFailedException("ATHR-001" ,"User has not signed in");
+            throw new AuthorizationFailedException("ATHR-001" , "User has not signed in");
         }else if (userAuthEntity.getLogoutAt()!=null){
             throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to post a question");
         }else {
