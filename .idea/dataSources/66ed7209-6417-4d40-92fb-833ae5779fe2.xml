@@ -12,13 +12,14 @@
       <IntrospectionStateNumber>567</IntrospectionStateNumber>
       <Current>1</Current>
       <Visible>1</Visible>
-      <Relations>sequence|table|16385|16389|1
-sequence|table|16401|16405|1
-sequence|table|16423|16427|1
-sequence|table|16387|16389|3
-sequence|table|16403|16405|3
-sequence|table|16425|16427|2
-</Relations>
+      <Relations>
+        sequence|table|16385|16389|1
+        sequence|table|16401|16405|1
+        sequence|table|16423|16427|1
+        sequence|table|16387|16389|3
+        sequence|table|16403|16405|3
+        sequence|table|16425|16427|2
+     </Relations>
     </database>
     <database id="3" parent="1" name="quora">
       <ObjectId>16446</ObjectId>
