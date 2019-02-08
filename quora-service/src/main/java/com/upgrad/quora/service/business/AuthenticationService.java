@@ -41,11 +41,12 @@ public class AuthenticationService {
             userAuthToken.setExpiresAt(expiresAt);
 
             userDao.createAuthToken(userAuthToken);
-            userDao.updateUser(userEntity);
+            //userDao.updateUser(userEntity);
 
             return userAuthToken;
         }else {
             throw new AuthenticationFailedException("ATH-002", "Password Failed");
         }
     }
+
 }

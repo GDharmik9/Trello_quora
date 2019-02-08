@@ -43,7 +43,25 @@ public class UserDao {
         }
     }
 
+    public UserAuthEntity getUserAuth(final String accessToken){
+        try {
+            return entityManager.createNamedQuery("userAuthByAccessToken", UserAuthEntity.class)
+                    .setParameter("accessToken" ,accessToken).getSingleResult();
+        }catch (NoResultException nre){
+            return null;
+        }
+    }
+
+    public UserAuthEntity setUserLogout(final UserAuthEntity userAuthEntity){
+        entityManager.persist(userAuthEntity);
+        return userAuthEntity;
+    }
+
     public void updateUser(final UserEntity updatedUserEntity){
         entityManager.merge(updatedUserEntity);
+    }
+
+    public  void updateUserAuth(final  UserEntity updatedUserAuth){
+        entityManager.merge(updatedUserAuth);
     }
 }
