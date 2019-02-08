@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "question" , schema = "quora")
+@Table(name = "question" , schema = "public")
 public class QuestionEntity implements Serializable {
 
     @Id
