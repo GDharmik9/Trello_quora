@@ -4,6 +4,7 @@ import com.upgrad.quora.service.entity.QuestionEntity;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 
 @Repository
@@ -15,5 +16,18 @@ public class QuestionDao {
     public QuestionEntity createQuestion(QuestionEntity questionEntity){
         entityManager.persist(questionEntity);
         return questionEntity;
+    }
+
+    public QuestionEntity deleteQuestion(QuestionEntity questionEntity) {
+        entityManager.remove(questionEntity);
+        return questionEntity;
+    }
+
+    public QuestionEntity getQuestionByUuid(String questionid){
+        try {
+                return entityManager.createNamedQuery("questionByUuid" , QuestionEntity.class).setParameter("questionid",questionid).getSingleResult();
+        } catch(NoResultException nre) {
+            return null;
+        }
     }
 }
