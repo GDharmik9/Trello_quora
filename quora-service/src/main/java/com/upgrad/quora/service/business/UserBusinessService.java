@@ -52,28 +52,6 @@ public class UserBusinessService {
         throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
-    public UserEntity deleteUser(String uuid, String authorization) throws UserNotFoundException, AuthorizationFailedException {
-        UserAuthEntity userAuthEntity = userDao.getUserAuth(authorization);
-        if (userAuthEntity != null) {
-            if (isUserSignedIn(userAuthEntity)) {
-                UserEntity userEntity = userDao.getUserByUuid(uuid);
-                if (userEntity == null) {
-                    throw new UserNotFoundException("USR-001", "User with entered uuid does not exist");
-                }
-                String role = userEntity.getRole();
-                if(role.equalsIgnoreCase("admin"))
-                {
-                    userDao.deleteUser(userEntity);
-                }
-                throw new AuthorizationFailedException("ATHR-003", "Unauthorized Access, Entered user is not an admin");
-            }
-            throw new AuthorizationFailedException("ATHR-002", "User is signed out");
-        }
-        throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
-
-
-    }
 
     private boolean isUserSignedIn(UserAuthEntity userAuthEntity)
     {
