@@ -2,14 +2,17 @@ package com.upgrad.quora.api.controller;
 
 
 import com.upgrad.quora.api.model.QuestionDeleteResponse;
+import com.upgrad.quora.api.model.QuestionDetailsResponse;
 import com.upgrad.quora.api.model.QuestionRequest;
 import com.upgrad.quora.api.model.QuestionResponse;
 import com.upgrad.quora.service.business.QuestionBusinessService;
 import com.upgrad.quora.service.business.UserAuthBusinessService;
 import com.upgrad.quora.service.entity.QuestionEntity;
 import com.upgrad.quora.service.entity.UserAuthEntity;
+import com.upgrad.quora.service.entity.UserEntity;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
 import com.upgrad.quora.service.exception.InvalidQuestionException;
+import com.upgrad.quora.service.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/")
@@ -63,4 +68,42 @@ public class QuestionController {
 
     }
 
+
+    @RequestMapping(method = RequestMethod.GET, path = "/question/all" , produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestion(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
+
+        final UserAuthEntity userAuthEntity = userAuthBusinessService.getUser(authorization);
+
+        final List<QuestionEntity> allQuestion = questionBusinessService.getAllQuestion(userAuthEntity);
+
+        List<QuestionDetailsResponse> questionResponse = questionslist(allQuestion);
+
+        return new ResponseEntity<List<QuestionDetailsResponse>>(questionResponse, HttpStatus.OK);
+    }
+
+    @RequestMapping(method = RequestMethod.GET , path = "/question/all/{userId}" , produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestionsByUser(@PathVariable("userId") final String userId, @RequestHeader("authorization") final String authorization )
+        throws AuthorizationFailedException , UserNotFoundException {
+
+        final UserAuthEntity userAuthEntity = userAuthBusinessService.getUser(authorization);
+
+        UserEntity userEntity = userAuthEntity.getUser();
+
+        final List<QuestionEntity> allQuestionByUser = questionBusinessService.getAllQuestionsByUser(userId , userAuthEntity);
+
+
+        return new ResponseEntity<List<QuestionDetailsResponse>>(questionslist(allQuestionByUser), HttpStatus.OK);
+
+    }
+
+    public List<QuestionDetailsResponse> questionslist(List<QuestionEntity> allQuestion){
+        List<QuestionDetailsResponse> listofquestions = new ArrayList<>();
+        for ( QuestionEntity questionEntity : allQuestion){
+            QuestionDetailsResponse Response = new QuestionDetailsResponse();
+            Response.id(questionEntity.getUuid());
+            Response.content(questionEntity.getContent());
+            listofquestions.add(Response);
+        }
+        return listofquestions;
+    }
 }

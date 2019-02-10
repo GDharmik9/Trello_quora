@@ -6,10 +6,13 @@ import com.upgrad.quora.service.entity.UserAuthEntity;
 import com.upgrad.quora.service.entity.UserEntity;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
 import com.upgrad.quora.service.exception.InvalidQuestionException;
+import com.upgrad.quora.service.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class QuestionBusinessService {
@@ -21,7 +24,8 @@ public class QuestionBusinessService {
     @Transactional(propagation = Propagation.REQUIRED)
     public QuestionEntity createQuestion(QuestionEntity questionEntity , UserAuthEntity userAuthEntity) throws  AuthorizationFailedException {
 
-       if (userAuthEntity.getLogoutAt() != null) {
+
+        if (userAuthEntity.getLogoutAt() != null) {
             throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to post a question");
         }
         return questionDao.createQuestion(questionEntity);
@@ -45,5 +49,28 @@ public class QuestionBusinessService {
                      questionDao.deleteQuestion(questionEntity);
             }throw new AuthorizationFailedException("ATHR-003", "Only the question owner or admin can delete the question");
         }
+    }
+    @Transactional(propagation = Propagation.REQUIRED)
+    public List<QuestionEntity> getAllQuestion(UserAuthEntity userAuthEntity) throws AuthorizationFailedException {
+
+        if (userAuthEntity.getLogoutAt() != null) {
+            throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to get all questions");
+        }
+
+        return questionDao.getAllQuestion();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public List<QuestionEntity> getAllQuestionsByUser(String userId , UserAuthEntity userAuthEntity) throws AuthorizationFailedException , UserNotFoundException {
+
+        UserEntity userEntity = userAuthEntity.getUser();
+
+
+        if(!userEntity.getUuid().equals(userId)){
+            throw new UserNotFoundException("USR-001" , "User with entered uuid whose question details are to be seen does not exist");
+        }else if (userAuthEntity.getLogoutAt()!=null){
+            throw  new AuthorizationFailedException("ATHR-002" ,"User is signed out.Sign in first to get all questions posted by a specific user");
+        }
+        return questionDao.getAllQuestionsByUser(userId);
     }
 }
