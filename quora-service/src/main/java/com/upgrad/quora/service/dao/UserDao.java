@@ -75,5 +75,5 @@ public class UserDao {
         entityManager.merge(updatedUserAuth);
     }
 
-    
+
 }
