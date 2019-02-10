@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
+import java.util.Base64;
 
 @Service
 public class UserBusinessService {
@@ -38,20 +39,41 @@ public class UserBusinessService {
     }
 
     public UserEntity getUserByUuid(String uuid, String authorization) throws AuthorizationFailedException, UserNotFoundException {
+        UserEntity userEntity = null;
+        if(authenticate(authorization))
+        {
+            userEntity = userDao.getUserByUuid(uuid);
+            if (userEntity == null) {
+                throw new UserNotFoundException("USR-001", "User with entered uuid does not exist");
+            }
+        }
+        return userEntity;
+    }
+
+    public UserEntity getUserFromAuth(String authorization) throws AuthorizationFailedException {
+        UserEntity userEntity = null;
+
+        if(authenticate(authorization))
+        {
+            byte[] decode = Base64.getDecoder().decode(authorization.split("Basic ")[1]);
+            String decodedText = new String(decode);
+            String[] decodedArray = decodedText.split(":");
+            userEntity = userDao.getUserByUserName(decodedArray[0]);
+        }
+        return userEntity;
+    }
+
+    public boolean authenticate(String authorization) throws AuthorizationFailedException
+    {
         UserAuthEntity userAuthEntity = userDao.getUserAuth(authorization);
         if (userAuthEntity != null) {
             if (isUserSignedIn(userAuthEntity)) {
-                UserEntity userEntity = userDao.getUserByUuid(uuid);
-                if (userEntity == null) {
-                    throw new UserNotFoundException("USR-001", "User with entered uuid does not exist");
-                }
-                return userEntity;
+                return true;
             }
             throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to get user details");
         }
         throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
     }
-
 
     private boolean isUserSignedIn(UserAuthEntity userAuthEntity)
     {
