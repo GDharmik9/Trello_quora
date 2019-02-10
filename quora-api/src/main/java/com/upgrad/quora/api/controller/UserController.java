@@ -44,6 +44,7 @@ public class UserController {
     @RequestMapping(method = RequestMethod.POST , path = "/user/signup" , consumes = MediaType.APPLICATION_JSON_UTF8_VALUE , produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SignupUserResponse> signup(final SignupUserRequest signupUserRequest) throws SignUpRestrictedException {
 
+        //Create userEntity
         final UserEntity userEntity = new UserEntity();
 
         userEntity.setUuid(UUID.randomUUID().toString());
@@ -58,6 +59,7 @@ public class UserController {
         userEntity.setMobile(signupUserRequest.getContactNumber());
         userEntity.setRole("nonadmin");
 
+        //Send userEntity to BusinessService & if user signup successful create Created Response
         final UserEntity createdUserEntity = userBusinessService.signup(userEntity);
         SignupUserResponse userResponse = new SignupUserResponse().id(createdUserEntity.getUuid()).status("USER SUCCESSFULLY REGISTERED");
 
@@ -67,13 +69,16 @@ public class UserController {
     @RequestMapping(method = RequestMethod.POST, path = "/user/signin", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SigninResponse> signin(@RequestHeader("authorization") final String authorization) throws AuthenticationFailedException {
 
+      //Decode authorization token
       byte[] decode = Base64.getDecoder().decode(authorization.split("Basic ")[1]);
       String decodedText = new String(decode);
       String[] decodedArray = decodedText.split(":");
 
+      //Authenticate User
         UserAuthEntity userAuthToken = authenticationService.authenticate(decodedArray[0],decodedArray[1]);
         UserEntity user =userAuthToken.getUser();
 
+        //If user authenticated successfuly create response with access token
         SigninResponse signinResponse = new SigninResponse().id(user.getUuid()).message("SIGNED IN SUCCESSFULLY");
 
         HttpHeaders headers = new HttpHeaders();
@@ -85,6 +90,7 @@ public class UserController {
     @RequestMapping(method = RequestMethod.POST, path = "/user/signout", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SignoutResponse> signout(@RequestHeader("authorization") final String authorization) throws SignOutRestrictedException {
 
+        //verify token and sign out user
         String [] bearerToken = authorization.split("Bearer ");
         final UserAuthEntity userAuthEntity = userAuthBusinessService.getUserSignOut(bearerToken[1]);
         UserEntity user = userAuthEntity.getUser();
