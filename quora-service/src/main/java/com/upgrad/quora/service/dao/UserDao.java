@@ -34,6 +34,10 @@ public class UserDao {
         }
     }
 
+    public void deleteUser(final UserEntity userEntity) {
+        entityManager.remove(userEntity);
+    }
+
     public UserEntity getUserByUserName(final String useName) {
         try {
             return entityManager.createNamedQuery("userByName", UserEntity.class).setParameter("username", useName)
