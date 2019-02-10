@@ -49,8 +49,8 @@ public class QuestionController {
     }
 
 
-    @RequestMapping(method = RequestMethod.DELETE , path = "/question/delete/{questionId}" ,  consumes = MediaType.APPLICATION_JSON_UTF8_VALUE , produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<QuestionDeleteResponse> deleteQuestion(@RequestHeader("authorization") final String authorization, @PathVariable("questionid") final String questionid )
+    @RequestMapping(method = RequestMethod.DELETE , path = "/question/delete/{questionId}" ,  produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<QuestionDeleteResponse> deleteQuestion(@RequestHeader("authorization") final String authorization, @PathVariable("questionId") final String questionid )
          throws AuthorizationFailedException , InvalidQuestionException {
 
         final UserAuthEntity userAuthEntity = userAuthBusinessService.getUser(authorization);

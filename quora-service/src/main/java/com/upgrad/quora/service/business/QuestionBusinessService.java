@@ -28,20 +28,22 @@ public class QuestionBusinessService {
     }
 
 
-    @Transactional
-    public QuestionEntity deleteQuestion(String questionid , UserAuthEntity userAuthEntity) throws AuthorizationFailedException, InvalidQuestionException {
+    @Transactional(propagation = Propagation.REQUIRED)
+    public QuestionEntity deleteQuestion(String questionId , UserAuthEntity userAuthEntity) throws AuthorizationFailedException, InvalidQuestionException {
 
-       UserEntity userEntity = userAuthEntity.getUser();
-       QuestionEntity questionEntity = questionDao.getQuestionByUuid(questionid);
+        QuestionEntity questionEntity = questionDao.getQuestionByUuid(questionId);
+        UserEntity userEntity = userAuthEntity.getUser();
 
-       if (userAuthEntity.getLogoutAt()!=null){
-           throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to delete a question");
-       }else if (userEntity.getRole().equals("nonadmin") && !userEntity.getId().equals(questionEntity.getUser())){
-           throw new AuthorizationFailedException("ATHR-003", "Only the question owner or admin can delete the question" );
-       }else if (questionEntity==null){
-           throw new InvalidQuestionException("QUES-001", "Entered question uuid does not exist");
-       }
-      return questionDao.deleteQuestion(questionEntity);
+        if (userAuthEntity.getLogoutAt() != null) {
+            throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to delete a question");
+        }else if (questionEntity == null) {
+            throw new InvalidQuestionException("QUES-001", "Entered question uuid does not exist");
+        }else {
+            Integer userId = questionEntity.getUser().getId();
+            String role = userEntity.getRole();
+            if ((role.equals("admin")) || userEntity.getId().equals(userId)) {
+                     questionDao.deleteQuestion(questionEntity);
+            }throw new AuthorizationFailedException("ATHR-003", "Only the question owner or admin can delete the question");
+        }
     }
-
 }

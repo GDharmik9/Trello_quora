@@ -18,16 +18,16 @@ public class QuestionDao {
         return questionEntity;
     }
 
-    public QuestionEntity deleteQuestion(QuestionEntity questionEntity) {
+    public void deleteQuestion(QuestionEntity questionEntity) {
         entityManager.remove(questionEntity);
-        return questionEntity;
+        //return questionEntity;
     }
 
-    public QuestionEntity getQuestionByUuid(String questionid){
+    public QuestionEntity getQuestionByUuid(String questionId) {
         try {
-                return entityManager.createNamedQuery("questionByUuid" , QuestionEntity.class).setParameter("questionid",questionid).getSingleResult();
-        } catch(NoResultException nre) {
-            return null;
+            return entityManager.createNamedQuery("questionByUuid", QuestionEntity.class).setParameter("uuid", questionId).getSingleResult();
+        } catch (NoResultException nre) {
+           return null;
         }
     }
 }
