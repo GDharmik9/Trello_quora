@@ -36,6 +36,7 @@ public class QuestionController {
 
         final UserAuthEntity userAuthEntity = userAuthBusinessService.getUser(authorization);
 
+
         final ZonedDateTime now = ZonedDateTime.now();
         QuestionEntity questionEntity = new QuestionEntity();
         questionEntity.setUuid(UUID.randomUUID().toString());

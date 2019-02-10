@@ -76,6 +76,10 @@ public class QuestionBusinessService {
         return questionDao.getAllQuestionsByUser(userId);
     }
 
+    public List<QuestionEntity> getAllQuestionById(String uuid) throws AuthorizationFailedException {
+        return questionDao.getAllQuestion();
+    }
+
 
     @Transactional(propagation = Propagation.REQUIRED)
     public QuestionEntity editQuestionContent(String questionId, UserAuthEntity userAuthEntity , String content) throws AuthorizationFailedException, InvalidQuestionException {
@@ -88,15 +92,30 @@ public class QuestionBusinessService {
         } else if (questionEntity == null) {
             throw new InvalidQuestionException("QUES-001", "Entered question uuid does not exist");
         }
-        Integer authUserId = userAuthEntity.getUser().getId();
-        Integer queUserId = questionEntity.getUser().getId();
+       Integer authUserId = userAuthEntity.getUser().getId();
+       Integer queUserId = questionEntity.getUser().getId();
         if (authUserId != queUserId){
-                throw new AuthorizationFailedException("ATHR-003", "Only the question owner can edit the question");
+            throw new AuthorizationFailedException("ATHR-003", "Only the question owner can edit the question");
         }
-                 questionEntity.setContent(content);
+        questionEntity.setContent(content);
         return  questionDao.editQuestion(questionEntity);
     }
 
+    private boolean compareUser(UserAuthEntity authEntity, QuestionEntity queEntity){
+        Integer authUserId = authEntity.getUser().getId();
+        Integer queUserId = queEntity.getUser().getId();
+        if (authUserId == queUserId){
+            return true;
+        }
+        return false;
+    }
 
+    public QuestionEntity validateQuestion(String questionId) throws InvalidQuestionException {
+        QuestionEntity questionEntity = questionDao.getQuestionByUuid(questionId);
+        if(questionEntity==null) {
+            throw new InvalidQuestionException("QUES-001","The question entered is invalid");
+        }
+        return questionEntity;
+    }
 }
 

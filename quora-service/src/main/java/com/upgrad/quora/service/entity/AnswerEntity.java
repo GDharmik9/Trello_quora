@@ -6,7 +6,15 @@ import java.io.Serializable;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "answer" , schema = "quora")
+@Table(name = "answer" , schema = "public")
+@NamedQueries(
+        {
+                @NamedQuery(name = "getAnswerFromId" , query = "select q from AnswerEntity q where q.uuid = :uuid"),
+                @NamedQuery(name = "checkAnswerBelongToUser" , query = "select a from AnswerEntity a INNER JOIN UserEntity u on a.user = u.id where a.uuid =:auuid and u.uuid = :uuuid"),
+                @NamedQuery(name = "getAllAnswers" , query = "select a from AnswerEntity a INNER JOIN QuestionEntity q on a.question = q.id where q.uuid = :uuid")
+        }
+)
+
 public class AnswerEntity implements Serializable {
 
     @Id

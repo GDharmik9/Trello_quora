@@ -42,18 +42,18 @@ public class QuestionDao {
         return questionEntity;
     }
 
-    public QuestionEntity getQuestionByUuid(String questionId) {
-        try {
-            return entityManager.createNamedQuery("questionByUuid", QuestionEntity.class).setParameter("questionId", questionId).getSingleResult();
-        } catch (NoResultException nre) {
-           return null;
+        public QuestionEntity getQuestionByUuid(String questionId){
+            try {
+                return entityManager.createNamedQuery("questionByUuid", QuestionEntity.class).setParameter("questionId", questionId).getSingleResult();
+            } catch (NoResultException nre) {
+                return null;
+            }
         }
-    }
 
-    public QuestionEntity editQuestion(QuestionEntity questionEntity){
-        entityManager.merge(questionEntity);
-    return questionEntity;
-    }
 
+        public QuestionEntity editQuestion (QuestionEntity questionEntity){
+            entityManager.merge(questionEntity);
+            return questionEntity;
+        }
 
 }
