@@ -34,6 +34,7 @@ public class QuestionController {
     @RequestMapping(method = RequestMethod.POST, path = "/question/create", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<QuestionResponse> createQuestion(@RequestHeader("authorization") final String authorization, final QuestionRequest questionRequest) throws AuthorizationFailedException {
 
+		//authenticate user
         final UserAuthEntity userAuthEntity = userAuthBusinessService.getUser(authorization);
 
         final ZonedDateTime now = ZonedDateTime.now();
@@ -43,6 +44,7 @@ public class QuestionController {
         questionEntity.setUser(userAuthEntity.getUser());
         questionEntity.setDate(now);
 
+        //send questionEntity to BusinessService, if successful return created response
         final QuestionEntity createdQuestion = questionBusinessService.createQuestion(questionEntity , userAuthEntity);
         QuestionResponse questionResponse = new QuestionResponse().id(createdQuestion.getUuid()).status("QUESTION CREATED");
 
@@ -54,9 +56,11 @@ public class QuestionController {
     public ResponseEntity<QuestionDeleteResponse> deleteQuestion(@RequestHeader("authorization") final String authorization, @PathVariable("questionId") final String questionid )
          throws AuthorizationFailedException , InvalidQuestionException {
 
+	    //authenticate user
         final UserAuthEntity userAuthEntity = userAuthBusinessService.getUser(authorization);
 
 
+        //delete question & send ok response
         QuestionEntity deletedQuestion = questionBusinessService.deleteQuestion(questionid, userAuthEntity);
         QuestionDeleteResponse questionDeleteResponse = new QuestionDeleteResponse().id(deletedQuestion.getUuid()).status("QUESTION DELETED");
 
@@ -68,12 +72,15 @@ public class QuestionController {
     @RequestMapping(method = RequestMethod.GET, path = "/question/all" , produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestion(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
 
+	    //authenticate user
         final UserAuthEntity userAuthEntity = userAuthBusinessService.getUser(authorization);
 
+        //get all questions
         final List<QuestionEntity> allQuestion = questionBusinessService.getAllQuestion(userAuthEntity);
 
         List<QuestionDetailsResponse> questionResponse = questionslist(allQuestion);
 
+        //return questions list
         return new ResponseEntity<List<QuestionDetailsResponse>>(questionResponse, HttpStatus.OK);
     }
 
@@ -81,8 +88,10 @@ public class QuestionController {
     public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestionsByUser(@PathVariable("userId") final String userId, @RequestHeader("authorization") final String authorization )
         throws AuthorizationFailedException , UserNotFoundException {
 
+	    //authenticate user
         final UserAuthEntity userAuthEntity = userAuthBusinessService.getUser(authorization);
 
+        //get all questions created by user
         final List<QuestionEntity> allQuestionByUser = questionBusinessService.getAllQuestionsByUser(userId , userAuthEntity);
 
         return new ResponseEntity<List<QuestionDetailsResponse>>(questionslist(allQuestionByUser), HttpStatus.OK);
@@ -93,9 +102,11 @@ public class QuestionController {
     public ResponseEntity<QuestionEditResponse> editQuestionContent(@PathVariable("questionId") final String questionId , @RequestHeader("authorization") final String authorization, QuestionEditRequest questionEditRequest)
     throws AuthorizationFailedException,InvalidQuestionException {
 
+	    //authenticate user
         final UserAuthEntity userAuthEntity = userAuthBusinessService.getUser(authorization);
         String content = questionEditRequest.getContent();
 
+        //edit question & send ok response
         QuestionEntity editedQuestion = questionBusinessService.editQuestionContent(questionId,userAuthEntity, content);
         QuestionEditResponse questionEditResponse = new QuestionEditResponse().id(editedQuestion.getUuid()).status("QUESTION EDITED");
 
@@ -105,6 +116,7 @@ public class QuestionController {
 
     public List<QuestionDetailsResponse> questionslist(List<QuestionEntity> allQuestion){
         List<QuestionDetailsResponse> listofquestions = new ArrayList<>();
+        //Create questionDetailsResponse list
         for ( QuestionEntity questionEntity : allQuestion){
             QuestionDetailsResponse Response = new QuestionDetailsResponse();
             Response.id(questionEntity.getUuid());
