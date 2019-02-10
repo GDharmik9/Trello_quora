@@ -37,10 +37,10 @@ public class UserBusinessService {
         return userDao.createUser(userEntity);
     }
 
-    public UserEntity getUserByUuid(String uuid, String authorization) throws AuthorizationFailedException, UserNotFoundException {
-        UserAuthEntity userAuthEntity = userDao.getUserAuth(authorization);
-        if (userAuthEntity != null) {
-            if (isUserSignedIn(userAuthEntity)) {
+    //this method takes uuid and userAuthEntity of user to get the Details of user
+    public UserEntity userProfile(String uuid , UserAuthEntity userAuthEntity) throws AuthorizationFailedException, UserNotFoundException {
+
+        if (isUserSignedIn(userAuthEntity)) {
                 UserEntity userEntity = userDao.getUserByUuid(uuid);
                 if (userEntity == null) {
                     throw new UserNotFoundException("USR-001", "User with entered uuid does not exist");
@@ -48,8 +48,6 @@ public class UserBusinessService {
                 return userEntity;
             }
             throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to get user details");
-        }
-        throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
     }
 
 

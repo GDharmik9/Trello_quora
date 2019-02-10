@@ -1,7 +1,6 @@
 package com.upgrad.quora.service.entity;
 
 import org.apache.commons.lang3.builder.*;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -13,8 +12,7 @@ import java.io.Serializable;
 @NamedQueries(
         {
                 @NamedQuery(name = "userByName", query = "select u from UserEntity u where u.username = :username"),
-                @NamedQuery(name = "userByEmail", query = "select u from UserEntity u where u.email =:email"),
-                @NamedQuery(name = "userByUuid", query = "select u from UserEntity u where u.uuid =:uuid")
+                @NamedQuery(name = "userByUuid", query = "select u from UserEntity u where u.uuid =:uuid"),
                 @NamedQuery(name = "userByEmail", query = "select u from UserEntity u where u.email =:email")
         }
 )
