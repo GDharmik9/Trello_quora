@@ -90,13 +90,13 @@ public class QuestionController {
     }
 
     @RequestMapping(method = RequestMethod.PUT , path = "/question/edit/{questionId}" ,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,produces = MediaType.APPLICATION_JSON_UTF8_VALUE )
-    public ResponseEntity<QuestionEditResponse> editQuestion(@PathVariable("questionId") final String questionId , @RequestHeader("authorization") final String authorization, QuestionEditRequest questionEditRequest)
+    public ResponseEntity<QuestionEditResponse> editQuestionContent(@PathVariable("questionId") final String questionId , @RequestHeader("authorization") final String authorization, QuestionEditRequest questionEditRequest)
     throws AuthorizationFailedException,InvalidQuestionException {
 
         final UserAuthEntity userAuthEntity = userAuthBusinessService.getUser(authorization);
         String content = questionEditRequest.getContent();
 
-        QuestionEntity editedQuestion = questionBusinessService.editQuestion(questionId,userAuthEntity, content);
+        QuestionEntity editedQuestion = questionBusinessService.editQuestionContent(questionId,userAuthEntity, content);
         QuestionEditResponse questionEditResponse = new QuestionEditResponse().id(editedQuestion.getUuid()).status("QUESTION EDITED");
 
         return new ResponseEntity<QuestionEditResponse>(questionEditResponse,HttpStatus.OK);

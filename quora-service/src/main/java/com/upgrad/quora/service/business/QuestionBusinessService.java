@@ -76,11 +76,9 @@ public class QuestionBusinessService {
 
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public QuestionEntity editQuestion(String questionId, UserAuthEntity userAuthEntity , String content) throws AuthorizationFailedException, InvalidQuestionException {
+    public QuestionEntity editQuestionContent(String questionId, UserAuthEntity userAuthEntity , String content) throws AuthorizationFailedException, InvalidQuestionException {
 
        QuestionEntity questionEntity = questionDao.getQuestionByUuid(questionId);
-       /*  Integer authUserId = userAuthEntity.getUser().getId();
-        Integer queUserId = questionEntity.getUser().getId();*/
         boolean validuser = compareUser(userAuthEntity, questionEntity);
         if (userAuthEntity.getLogoutAt() != null) {
             throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to edit the question");
