@@ -60,12 +60,12 @@ public class AnswerController {
 
     @RequestMapping(method = RequestMethod.PUT, path = "/answer/edit/{answerId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<AnswerEditResponse> editAnswerContent(final AnswerEditRequest answerEditRequest, @PathVariable("answerId") final String answerId,
-                                                            @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, AnswerNotFoundException {
+                                                                @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, AnswerNotFoundException {
 
         UserAuthEntity userAuthEntity = userAuthBusinessService.getUser(authorization);
-        UserEntity userEntity = userAuthEntity.getUser();
+
         AnswerEntity answerEntity = answerBusinessService.getAnswerFromId(answerId);
-        AnswerEntity checkedAnswer = answerBusinessService.checkAnswerBelongToUser(userEntity,answerEntity);
+        AnswerEntity checkedAnswer = answerBusinessService.checkAnswerBelongToUser(userAuthEntity,answerEntity);
 
         checkedAnswer.setAnswer(answerEditRequest.getContent());
         AnswerEntity updatedAnswer = answerBusinessService.updateAnswer(checkedAnswer);
@@ -76,9 +76,9 @@ public class AnswerController {
         return new ResponseEntity<AnswerEditResponse>(answerEditResponse,HttpStatus.OK);
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, path = "/answer/delete/{answerId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<AnswerDeleteResponse> deleteAnswer(@PathVariable("answerId") final String answerId,
-                                                            @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, AnswerNotFoundException {
+    @RequestMapping(method = RequestMethod.DELETE, path = "/answer/delete/{answerId}",  produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<AnswerDeleteResponse> deleteAnswer(@PathVariable("answerId") final String answerId, @RequestHeader("authorization") final String authorization)
+            throws AuthorizationFailedException, AnswerNotFoundException {
 
         UserAuthEntity userAuthEntity = userAuthBusinessService.getUser(authorization);
         UserEntity userEntity= userAuthEntity.getUser();
@@ -89,7 +89,7 @@ public class AnswerController {
             checkedAnswer = answerEntity;
         }
         else {
-            checkedAnswer = answerBusinessService.checkAnswerBelongToUser(userEntity, answerEntity);
+            checkedAnswer = answerBusinessService.checkAnswerBelongToUser(userAuthEntity, answerEntity);
         }
         AnswerEntity deletedAnswer = answerBusinessService.deleteAnswer(checkedAnswer);
 
@@ -99,17 +99,16 @@ public class AnswerController {
         return new ResponseEntity<AnswerDeleteResponse>(answerDeleteResponse,HttpStatus.OK);
     }
 
-    @RequestMapping(method = RequestMethod.GET, path = "answer/all/{questionId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<List<AnswerDetailsResponse>> getAllAnswersToQuestion(@PathVariable("questionId") final String questionId,
-                                                                             @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, InvalidQuestionException {
+    @RequestMapping(method = RequestMethod.GET, path = "answer/all/{questionId}",  produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<List<AnswerDetailsResponse>> getAllAnswersToQuestion(@PathVariable("questionId") final String questionId, @RequestHeader("authorization") final String authorization)
+            throws AuthorizationFailedException, InvalidQuestionException {
 
         UserAuthEntity userAuthEntity = userAuthBusinessService.getUser(authorization);
         QuestionEntity questionEntity = questionBusinessService.validateQuestion(questionId);
 
-        UserEntity userEntity = userAuthEntity.getUser();
 
         ArrayList<AnswerDetailsResponse> list = null;
-        ArrayList<AnswerEntity> rawList = (ArrayList) answerBusinessService.getAllAnswers(questionId);
+        ArrayList<AnswerEntity> rawList = (ArrayList) answerBusinessService.getAllAnswers(questionId , userAuthEntity);
 
         for(AnswerEntity answer : rawList)
         {

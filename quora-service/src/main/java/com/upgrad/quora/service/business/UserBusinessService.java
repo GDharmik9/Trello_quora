@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.ZonedDateTime;
-
 @Service
 public class UserBusinessService {
 
@@ -40,21 +38,20 @@ public class UserBusinessService {
     //this method takes uuid and userAuthEntity of user to get the Details of user
     public UserEntity userProfile(String uuid , UserAuthEntity userAuthEntity) throws AuthorizationFailedException, UserNotFoundException {
 
-        if (isUserSignedIn(userAuthEntity)) {
-                UserEntity userEntity = userDao.getUserByUuid(uuid);
-                if (userEntity == null) {
-                    throw new UserNotFoundException("USR-001", "User with entered uuid does not exist");
-                }
-                return userEntity;
-            }
+        UserEntity userEntity = userDao.getUserByUuid(uuid);
+        if (userAuthEntity.getLogoutAt()!=null) {
             throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to get user details");
+        }else if (userEntity == null) {
+            throw new UserNotFoundException("USR-001", "User with entered uuid does not exist");
+        }
+        return userEntity;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     public UserEntity deleteUser(String uuid, String authorization) throws UserNotFoundException, AuthorizationFailedException {
         UserAuthEntity userAuthEntity = userDao.getUserAuth(authorization);
         if (userAuthEntity != null) {
-            if (isUserSignedIn(userAuthEntity)) {
+            if ((userAuthEntity.getLogoutAt() == null)) {
                 UserEntity userEntity = userDao.getUserByUuid(uuid);
                 if (userEntity == null) {
                     throw new UserNotFoundException("USR-001", "User with entered uuid does not exist");
@@ -71,16 +68,6 @@ public class UserBusinessService {
         throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
 
 
-    }
-
-    private boolean isUserSignedIn(UserAuthEntity userAuthEntity)
-    {
-        if (userAuthEntity.getExpiresAt().isAfter(ZonedDateTime.now()) && (userAuthEntity.getLogoutAt() == null
-                || userAuthEntity.getLogoutAt().isAfter(ZonedDateTime.now())))
-        {
-            return true;
-        }
-        return false;
     }
 
 

@@ -21,9 +21,10 @@ public class UserAuthBusinessService {
     @Transactional
     public UserAuthEntity getUser(final String authorizationToken) throws AuthorizationFailedException {
 
+/*
         String[] bearerToken = authorizationToken.split("Bearer ");
-
-        UserAuthEntity userAuthEntity = userDao.getUserAuth(bearerToken[1]);
+*/
+        UserAuthEntity userAuthEntity = userDao.getUserAuth(authorizationToken);
         if (userAuthEntity == null) {
             throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
         }
@@ -31,21 +32,23 @@ public class UserAuthBusinessService {
     }
 
     @Transactional
-    public UserAuthEntity getUserSignOut(final String authorizationToken) throws SignOutRestrictedException {
+    public UserAuthEntity getUserSignOut(final String authorizationToken) throws SignOutRestrictedException  {
 
         UserAuthEntity userAuthToken = userDao.getUserAuth(authorizationToken);
         if (userAuthToken == null){
             throw new SignOutRestrictedException("SGR-001" , "User is not Signed in");
-        }else if (userAuthToken.getLogoutAt()== null){
-            final ZonedDateTime now = ZonedDateTime.now();
-            userAuthToken.setLogoutAt(now);
-            userDao.setUserLogout(userAuthToken);
+        }
+        else if (userAuthToken.getLogoutAt()!= null){
+            throw new SignOutRestrictedException("SGR-002" , "User is already SignOut");
+        }
+
+        final ZonedDateTime now = ZonedDateTime.now();
+        userAuthToken.setLogoutAt(now);
+        userDao.setUserLogout(userAuthToken);
             /*UserEntity userEntity = userAuthToken.getUser();
             userDao.updateUserAuth(userEntity);
             */
-            return userAuthToken;
-        }
-        throw new SignOutRestrictedException("SGR-002" , "User is already SignOut");
+        return userAuthToken;
     }
 
 

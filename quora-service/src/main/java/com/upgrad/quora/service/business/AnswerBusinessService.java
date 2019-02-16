@@ -39,11 +39,19 @@ public class AnswerBusinessService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public AnswerEntity checkAnswerBelongToUser(UserEntity userEntity, AnswerEntity answerEntity) throws AuthorizationFailedException {
-        AnswerEntity checkedAnswer = answerDao.checkAnswerBelongToUser(userEntity,answerEntity);
+    public AnswerEntity checkAnswerBelongToUser(UserAuthEntity userAuthEntity, AnswerEntity answerEntity) throws AuthorizationFailedException {
+
+        UserEntity userEntity = userAuthEntity.getUser();
+
+        if(userAuthEntity.getLogoutAt()!=null){
+            throw new AuthorizationFailedException("ATHR-002" ,"User is signed out.Sign in first to edit an answer");
+        }
+        String auuid = answerEntity.getUuid();
+        String uuuid = userEntity.getUuid();
+        AnswerEntity checkedAnswer = answerDao.checkAnswerBelongToUser(auuid,uuuid);
         if(checkedAnswer==null)
         {
-            throw new AuthorizationFailedException("'ATHR-003","Only the answer owner can edit or delete the answer");
+            throw new AuthorizationFailedException("ATHR-003","Only the answer owner can edit or delete the answer");
         }
         return checkedAnswer;
     }
@@ -62,8 +70,12 @@ public class AnswerBusinessService {
         return deletedAnswer;
     }
 
-    public List<AnswerEntity> getAllAnswers(String questionId)
+    public List<AnswerEntity> getAllAnswers(String questionId , UserAuthEntity userAuthEntity) throws AuthorizationFailedException
     {
+        if (userAuthEntity.getLogoutAt()!= null){
+            throw new AuthorizationFailedException("ATHR-002" ,"User is signed out.Sign in first to edit an answer");
+
+        }
         return answerDao.getAllAnswers(questionId);
     }
 }

@@ -1,7 +1,6 @@
 package com.upgrad.quora.service.dao;
 
 import com.upgrad.quora.service.entity.AnswerEntity;
-import com.upgrad.quora.service.entity.UserEntity;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -32,13 +31,11 @@ public class AnswerDao {
         }
     }
 
-    public AnswerEntity checkAnswerBelongToUser(UserEntity userEntity, AnswerEntity answerEntity)
+    public AnswerEntity checkAnswerBelongToUser(String auuid, String uuuid)
     {
-        String auuid = answerEntity.getUuid();
-        String uuuid = userEntity.getUuid();
+
         try {
-            return entityManager.createNamedQuery("checkAnswerBelongToUser", AnswerEntity.class)
-                    .setParameter("auuid", auuid).setParameter("uuuid",uuuid).getSingleResult();
+            return entityManager.createNamedQuery("checkAnswerBelongToUser", AnswerEntity.class).setParameter("auuid", auuid).setParameter("uuuid",uuuid).getSingleResult();
         }catch (NoResultException nre)
         {
             return null;

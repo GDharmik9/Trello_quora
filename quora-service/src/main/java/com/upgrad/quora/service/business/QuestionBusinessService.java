@@ -67,11 +67,10 @@ public class QuestionBusinessService {
 
         UserEntity userEntity = userAuthEntity.getUser();
 
-
-        if (!userEntity.getUuid().equals(userId)) {
-            throw new UserNotFoundException("USR-001", "User with entered uuid whose question details are to be seen does not exist");
-        } else if (userAuthEntity.getLogoutAt() != null) {
+        if (userAuthEntity.getLogoutAt() != null) {
             throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to get all questions posted by a specific user");
+        }else if (!userEntity.getUuid().equals(userId)) {
+            throw new UserNotFoundException("USR-001", "User with entered uuid whose question details are to be seen does not exist");
         }
         return questionDao.getAllQuestionsByUser(userId);
     }
